@@ -178,3 +178,44 @@ void Board::setBoard(char data[]) {
         }
     }
 }
+
+/* Pass in the move whose score we want to calculate and our side so we can
+ * appropriately score the move. Returns an int representing the score of the
+ * move.
+ */
+int Board::score(Move *m, Side side)
+{
+    int x = m->x;
+    int y = m->y;
+    int multiplier = 1;
+    // Assign a multiplier to give preferential value to certain squares on
+    // the board
+    if ((x == 0 || x == 7) && (y == 0 || y == 7)) {
+        multiplier = 3;
+    }
+    else if ((x == 1 || x == 6) && (y == 1 || y == 6)) {
+        multiplier = -3;
+    }
+    else if (((x == 1 || x == 6) && (y == 0 || y == 7)) ||
+    ((x == 0 || x == 7) && (y == 1 || y == 6))) {
+        multiplier = -1;
+    }
+    else if (x == 0 || y == 0 || x == 7 || y == 7) {
+        multiplier = 2;
+    }
+    // Create a copy of the board to perform the move and check the number of
+    // stones of each player after the move.
+    Board *copy = this->copy();
+    // Count the number of stones we have before the move
+    int stones_init = copy->count(side);
+    // Perform the move on the copy
+    copy->doMove(m, side);
+    // Count difference in stones that the move induces, and hit it with
+    // that multiplier
+    int score = multiplier * (copy->count(side) - stones_init);
+
+    // Now that we no longer need the copy board, let's delete it
+    delete copy;
+
+    return score;
+}

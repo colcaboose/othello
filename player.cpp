@@ -56,6 +56,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
     // If there are valid moves for our side to make...
     if (this->board->Board::hasMoves(my_side)) {
+        // Initialize the best_score as an arbitrary negative score so that
+        // the first legal move definitely becomes the best
+        int best_score = -3000;
+        // Create a placeholder for the best move
+        Move *best = nullptr;
         // Cycle through the squares on the board
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -63,15 +68,19 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                 Move *possible = new Move(i , j);
                 // If this move is legal for our side to make, let's make it
                 if (this->board->Board::checkMove(possible, my_side)) {
-                    this->board->Board::doMove(possible, my_side);
-                    // return this move
-                    return possible;
+                    if (this->board->Board::score(possible, my_side)
+                    > best_score) {
+                        best_score = this->board->Board::score(possible, my_side);
+                        best = possible;
+                    }
                 }
                 else {
                     delete possible;
                 }
             }
         }
+        this->board->Board::doMove(best, my_side);
+        return best;
     }
 
     return nullptr;
