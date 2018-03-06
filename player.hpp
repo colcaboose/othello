@@ -17,6 +17,10 @@ public:
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+    // Variable to hold our side
+    Side my_side;
+
+    Board *board;
 };
 
 #endif
