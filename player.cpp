@@ -47,8 +47,6 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    std::cerr << "ehllo!" << std::endl;
-
     // Updates the board with the opponent's move depending on their side
     if (my_side == BLACK) {
         this->board->Board::doMove(opponentsMove, WHITE);
@@ -58,11 +56,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
     // If there are valid moves for our side to make...
     if (this->board->Board::hasMoves(my_side)) {
-        std::cerr << "ehllo!" << std::endl;
         // Cycle through the squares on the board
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                std::cerr << i << " " << j << std::endl;
                 // Create a move for our side to possibly make at square i,j
                 Move *possible = new Move(i , j);
                 // If this move is legal for our side to make, let's make it
