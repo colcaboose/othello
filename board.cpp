@@ -206,11 +206,13 @@ int Board::score(Move *m, Side side)
     // Create a copy of the board to perform the move and check the number of
     // stones of each player after the move.
     Board *copy = this->copy();
+    // Count the number of stones we have before the move
+    int stones_init = copy->count(side);
     // Perform the move on the copy
     copy->doMove(m, side);
     // Count difference in stones that the move induces, and hit it with
     // that multiplier
-    int score = multiplier * copy->count(side);
+    int score = multiplier * (copy->count(side) - stones_init);
 
     // Now that we no longer need the copy board, let's delete it
     delete copy;
