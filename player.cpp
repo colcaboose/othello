@@ -47,41 +47,123 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    // Updates the board with the opponent's move depending on their side
+    // Holds side of the opponent
+    Side other_side;
+    // Calculate side of the opponent
     if (my_side == BLACK) {
-        this->board->Board::doMove(opponentsMove, WHITE);
+        other_side = WHITE;
     }
     else {
-        this->board->Board::doMove(opponentsMove, BLACK);
+        other_side = BLACK;
     }
-    // If there are valid moves for our side to make...
-    if (this->board->Board::hasMoves(my_side)) {
-        // Initialize the best_score as an arbitrary negative score so that
-        // the first legal move definitely becomes the best
-        int best_score = -3000;
-        // Create a placeholder for the best move
-        Move *best = nullptr;
-        // Cycle through the squares on the board
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                // Create a move for our side to possibly make at square i,j
-                Move *possible = new Move(i , j);
-                // If this move is legal for our side to make, let's make it
-                if (this->board->Board::checkMove(possible, my_side)) {
-                    if (this->board->Board::score(possible, my_side)
-                    > best_score) {
-                        best_score = this->board->Board::score(possible, my_side);
-                        best = possible;
+    // Now perform the opponent's move on the board
+    this->board->Board::doMove(opponentsMove, other_side);
+    if (testingMinimax) {
+        // If there are valid moves for our side to make...
+        if (this->board->Board::hasMoves(my_side)) {
+            // Initialize the best_score as an arbitrary negative score so that
+            // the first legal move definitely becomes the best
+            int best_score = -3000;
+            // Create a placeholder for the best move
+            Move *best = nullptr;
+            // Create a placeholder for our current score
+            int our_score;
+            // Cycle through the squares on the board
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    // Create a move for our side to possibly make at square i,j
+                    Move *possible1 = new Move(i, j);
+                    // Check if this move is legal on the current board
+                    if (this->board->Board::checkMove(possible1, my_side)) {
+                        // Calculate the score of this move on the current board
+                        our_score = this->board->Board::score(possible1, my_side);
+                        // We need to create a copy of the board that represents
+                        // the board after this ossible move. We will check the
+                        // opponent's response move on this board
+                        Board *copy = this->board->Board::copy();
+                        // We will keep track of the opponent's optimal score
+                        // in response to ours according to our heuristic
+                        int their_score = -3000;
+                        // Cycle through to find a possible move for other_side
+                        for (int k = 0; k < 8; k++) {
+                            for (int l = 0; l < 8; l++) {
+                                // Create a move at this square
+                                Move *possible2 = new Move(k, l);
+                                // If this move is possible for the other side on
+                                // the copy board..
+                                if (copy->Board::checkMove(possible2, 
+                                    other_side)) {
+                                    // Check if this move for the other side is
+                                    // better than any other that we have calculated
+                                    // in response to our i,j move.
+                                    if (copy->Board::score(possible2, 
+                                        other_side) > their_score) {
+                                        // If it is, we set their_score to their new
+                                        // optimal score, and same for optimal move
+                                        their_score = copy->Board::score(possible2, 
+                                            other_side);
+                                    }
+                                }
+                                delete possible2;
+                            }
+                        }
+                        delete copy;
+
+                        // Now we have computed their best move in response to our
+                        // move at i,j. In order to mamximize our minimum gain, we
+                        // should compute the largest difference between our score
+                        // increase and opponent's most optimal score increase.
+                        if (our_score - their_score > best_score) {
+                            // Set best score to the best difference so far
+                            best_score = our_score - their_score;
+                            // The move associated with this best score is saved in
+                            // possible1, so we assign it to Move *best
+                            best = possible1;
+                        }
+                    }
+                    // If the move is not possible, delete it
+                    else {
+                        delete possible1;
                     }
                 }
-                else {
-                    delete possible;
+            }
+            // Do the best move
+            this->board->Board::doMove(best, my_side);
+            return best;
+        }
+
+        return nullptr;
+    }
+    else {
+        // If there are valid moves for our side to make...
+        if (this->board->Board::hasMoves(my_side)) {
+            // Initialize the best_score as an arbitrary negative score so that
+            // the first legal move definitely becomes the best
+            int best_score = -3000;
+            // Create a placeholder for the best move
+            Move *best = nullptr;
+            // Cycle through the squares on the board
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    // Create a move for our side to possibly make at square i,j
+                    Move *possible = new Move(i , j);
+                    // If this move is legal for our side to make, let's make it
+                    if (this->board->Board::checkMove(possible, my_side)) {
+                        if (this->board->Board::score(possible, my_side)
+                        > best_score) {
+                            best_score = this->board->Board::score(possible, my_side);
+                            best = possible;
+                        }
+                    }
+                    else {
+                        delete possible;
+                    }
                 }
             }
+            this->board->Board::doMove(best, my_side);
+            return best;
         }
-        this->board->Board::doMove(best, my_side);
-        return best;
-    }
 
-    return nullptr;
+        return nullptr;
+    }
 }
