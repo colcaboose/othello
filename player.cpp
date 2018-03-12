@@ -13,7 +13,7 @@
  */
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
-    testingMinimax = false;
+    testingMinimax = true;
 
     // Create a board
     board = new Board();
