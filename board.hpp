@@ -29,7 +29,6 @@ public:
     int countBlack();
     int countWhite();
     int score(Move *m, Side side);
-
     void setBoard(char data[]);
 };
 

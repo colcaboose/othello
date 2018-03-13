@@ -92,17 +92,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                                 Move *possible2 = new Move(k, l);
                                 // If this move is possible for the other side on
                                 // the copy board..
-                                if (copy->Board::checkMove(possible2, 
+                                if (copy->Board::checkMove(possible2,
                                     other_side)) {
-                                    
                                     // Check if this move for the other side is
                                     // better than any other that we have calculated
                                     // in response to our i,j move.
-                                    if (copy->Board::score(possible2, 
+                                    if (copy->Board::score(possible2,
                                         other_side) > their_score) {
                                         // If it is, we set their_score to their new
                                         // optimal score, and same for optimal move
-                                        their_score = copy->Board::score(possible2, 
+                                        their_score = copy->Board::score(possible2,
                                             other_side);
                                     }
                                 }
