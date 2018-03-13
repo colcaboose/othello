@@ -78,9 +78,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                         // Calculate the score of this move on the current board
                         our_score = this->board->Board::score(possible1, my_side);
                         // We need to create a copy of the board that represents
-                        // the board after this ossible move. We will check the
+                        // the board after this possible move. We will check the
                         // opponent's response move on this board
                         Board *copy = this->board->Board::copy();
+                        copy->Board::doMove(possible1, my_side);
                         // We will keep track of the opponent's optimal score
                         // in response to ours according to our heuristic
                         int their_score = -3000;
@@ -93,6 +94,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                                 // the copy board..
                                 if (copy->Board::checkMove(possible2, 
                                     other_side)) {
+                                    
                                     // Check if this move for the other side is
                                     // better than any other that we have calculated
                                     // in response to our i,j move.
@@ -134,6 +136,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
         return nullptr;
     }
+    // when testingMinimax is false:
     else {
         // If there are valid moves for our side to make...
         if (this->board->Board::hasMoves(my_side)) {
